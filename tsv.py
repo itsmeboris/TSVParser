@@ -43,10 +43,26 @@ def make_dirs():
         if not os.path.exists(dir):
             os.mkdir(dir)
 
+def build_map(url_file, url_map_file):
+    with open(url_file, 'r', newline='', encoding='utf-8') as url_tsv_file:
+            with open(url_map_file, 'w', newline='', encoding='utf-8') as url_map:
+                reader = csv.reader(url_tsv_file, delimiter='\t')
+                url_tsy_file_line = url_tsv_file.readline()
+                for index, chunk in enumerate(reader):
+                    if len(chunk) == 1:
+                        chunks = chunk[0].split('$')
+                        name = re.sub('[()."]', '', chunks[2])
+                        url_map.write(f'{index}\t{name}\thttps://www.izkor.gov.il/{name.replace(" ", "%20")}/{chunks[0]}\n')
+
+
+
 if __name__ == '__main__':
     file_path = 'E:\WorkSpace\lemlda\izkor-full-data-json.tsv'
-    map_name = 'E:\WorkSpace\lemlda\map.txt'
+    map_name_file = 'E:\WorkSpace\lemlda\map.txt'
+    url_file = 'E:\WorkSpace\lemlda\\url.tsv'
+    url_map_file = 'E:\WorkSpace\lemlda\\urlmap.txt'
 
+    build_map(url_file, url_map_file)
     if (
         not os_path.isfile(file_path) or
         not file_path.endswith('.tsv')
@@ -55,7 +71,7 @@ if __name__ == '__main__':
         sys_exit()
     make_dirs()
     file_name = os_path.splitext(file_path)[0]
-    map_file = open(map_name, 'w', newline='', encoding='utf-8')
+    map_file = open(map_name_file, 'w', newline='', encoding='utf-8')
 
     with open(file_path, 'r', newline='', encoding='utf-8') as tsv_file:
 
@@ -76,7 +92,7 @@ if __name__ == '__main__':
                 if c == chunk[0]:
                     date = pd.to_datetime(name.split('_')[-1])
                     folder = get_folder(date)
-                    map_file.write("{0}\t\t{1}\t\t{2}\n".format(name, index, folder))
+                    map_name_file.write("{0}\t\t{1}\t\t{2}\n".format(name, index, folder))
                     continue
                 chunk_name = 'E:\WorkSpace\lemlda\corpus\{0}'.format(folder)
                 with open('{0}\{1}_{2}.txt'.format(chunk_name, index, counter), 'w', newline='', encoding='utf-8') as chunk_file:
